@@ -9,8 +9,11 @@ import co.edu.uniandes.ecos.statusquo.persistence.dao.PacienteDAO;
 import co.edu.uniandes.ecos.statusquo.persistence.entities.Paciente;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ejb.EJB;
+import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
@@ -30,8 +33,18 @@ import org.json.simple.JSONObject;
 @Produces(MediaType.APPLICATION_JSON)
 public class PacienteService {
 
-    @EJB
     private PacienteDAO dao;
+
+    @PostConstruct
+    public void init() {
+
+        try {
+            final Context context = new InitialContext();
+            dao = (PacienteDAO) context.lookup("java:global/Experimento-1-1/PacienteDAO");
+        } catch (ClassCastException | NamingException ex) {
+            ex.printStackTrace(System.out);
+        }
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
